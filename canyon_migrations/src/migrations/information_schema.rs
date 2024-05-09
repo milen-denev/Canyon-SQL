@@ -68,7 +68,17 @@ impl ColumnMetadataTypeValue {
                 _ => Self::NoneValue,
             },
             #[cfg(feature = "mysql")]
-            ColumnType::MySQL(_) => todo!(),
+            ColumnType::MySQL(v) => {
+                match v {
+                    MY_TY::VarChar | MY_TY::Text => Self::StringValue(
+                        row.get_mysql_opt::<&str>(col.name())
+                            .map(|opt| opt.to_owned()),
+                    ),
+                    MY_TY::Int => Self::IntValue(row.get_mysql_opt::<i32>(col.name())),
+                    // Add additional MySQL type matches here
+                    _ => Self::NoneValue,
+                }
+            }
         }
     }
 }

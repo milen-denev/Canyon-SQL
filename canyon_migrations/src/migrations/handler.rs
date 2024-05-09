@@ -95,7 +95,7 @@ impl Migrations {
             #[cfg(feature = "mssql")]
             DatabaseType::SqlServer => constants::mssql_queries::FETCH_PUBLIC_SCHEMA,
             #[cfg(feature = "mysql")]
-            DatabaseType::MySQL => todo!("Not implemented fetch database in mysql"),
+            DatabaseType::MySQL => constants::mysql_queries::FETCH_PUBLIC_SCHEMA
         };
 
         Self::query(query, [], datasource_name)

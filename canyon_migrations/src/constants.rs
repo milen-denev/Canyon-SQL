@@ -90,6 +90,36 @@ pub mod mssql_queries {
             WHERE gi.TABLE_SCHEMA = 'dbo'";
 }
 
+#[cfg(feature = "mysql")]
+pub mod mysql_queries {
+    pub static CANYON_MEMORY_TABLE: &str = "IF OBJECT_ID(N'[dbo].[canyon_memory]', N'U') IS NULL
+        CREATE TABLE IF NOT EXISTS canyon_memory (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            filepath VARCHAR(255) NOT NULL,
+            struct_name VARCHAR(255) NOT NULL,
+            declared_table_name VARCHAR(255) NOT NULL
+        );";
+
+    pub static FETCH_PUBLIC_SCHEMA: &str =
+        "SELECT
+            COLUMN_NAME AS 'column_name',
+            TABLE_NAME AS 'table_name',
+            COLUMN_TYPE AS 'data_type',
+            CHARACTER_MAXIMUM_LENGTH AS 'character_maximum_length',
+            IS_NULLABLE AS 'is_nullable',
+            COLUMN_DEFAULT AS 'column_default',
+            CASE WHEN COLUMN_KEY = 'PRI' THEN 'PRIMARY KEY' ELSE NULL END AS 'primary_key_info',
+            CASE WHEN COLUMN_KEY = 'PRI' THEN COLUMN_NAME ELSE NULL END AS 'primary_key_name',
+            CASE WHEN COLUMN_KEY = 'MUL' THEN 'FOREIGN KEY' ELSE NULL END AS 'foreign_key_info',
+            CASE WHEN COLUMN_KEY = 'MUL' THEN COLUMN_NAME ELSE NULL END AS 'foreign_key_name',
+            EXTRA AS 'is_identity',
+            NULL AS 'identity_generation'
+        FROM
+            INFORMATION_SCHEMA.COLUMNS
+        WHERE 
+            TABLE_SCHEMA = 'information_schema'";
+}
+
 /// Constant string values that holds regex patterns
 pub mod regex_patterns {
     pub const EXTRACT_RUST_OPT_REGEX: &str = r"[Oo][Pp][Tt][Ii][Oo][Nn]<(?P<rust_type>[\w<>]+)>";
@@ -167,6 +197,19 @@ pub mod sqlserver_type {
     pub const DATE: &str = "DATE";
     pub const TIME: &str = "TIME";
     pub const DATETIME: &str = "DATETIME2";
+}
+
+#[cfg(feature = "mysql")]
+pub mod mysql_type {
+    pub const INT_8: &str = "tinyint"; // MySQL equivalent for PostgreSQL's int8
+    pub const SMALL_INT: &str = "smallint"; // Same as PostgreSQL
+    pub const INTEGER: &str = "int"; // Same as PostgreSQL's integer
+    pub const BIGINT: &str = "bigint"; // Same as PostgreSQL
+    pub const TEXT: &str = "text"; // Same as PostgreSQL
+    pub const BOOLEAN: &str = "tinyint(1)"; // MySQL uses tinyint(1) to represent boolean
+    pub const DATE: &str = "date"; // Same as PostgreSQL
+    pub const TIME: &str = "time"; // Same as PostgreSQL
+    pub const DATETIME: &str = "datetime"; // MySQL's equivalent for PostgreSQL's timestamp without time zone
 }
 
 pub mod mocked_data {
